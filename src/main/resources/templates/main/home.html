@@ -29,7 +29,7 @@
                 </thead>
 
                 <tbody>
-                <tr th:each="aProject : ${projects}">
+                <tr th:each="aProject : ${projectsList}">
                     <td th:text="${aProject.name}"/>
                     <td/>
                     <td th:text="${aProject.stage}"/>
@@ -44,6 +44,10 @@
             <canvas id="myChart" height="400" width="400"></canvas>
         </div>
 
+        <script>
+            var chartData = "[[${projectStatusCount}]]";
+        </script>
+
     </div>
 </div>
 
@@ -56,15 +60,19 @@
                 <tr>
                     <th> Employee Name</th>
                     <th></th>
-                    <th> Employee Email</th>
+                    <th> Employee Last Name</th>
+                    <th></th>
+                    <th> Project Count</th>
                 </tr>
                 </thead>
 
                 <tbody>
-                <tr th:each="employee : ${employees}">
-                    <td th:text="${employee.firstName}"/>
+                <tr th:each="employeeProjectCount : ${employeesListProjectCount}">
+                    <td th:text="${employeeProjectCount.firstName}"/>
                     <td/>
-                    <td th:text="${employee.email}"/>
+                    <td th:text="${employeeProjectCount.lastName}"/>
+                    <td/>
+                    <td th:text="${employeeProjectCount.projectCount}"/>
                 </tr>
 
                 </tbody>
@@ -76,14 +84,28 @@
 </div>
 
 <script type="text/javascript">
+
+    let charDataString = decodeHtml(chartData);
+    let chartJsonArray = JSON.parse(charDataString);
+
+    let arrayLength = chartJsonArray.length;
+
+    let numericData = [];
+    let labelData = [];
+
+    for (let i = 0; i < arrayLength; i++) {
+        numericData[i] = chartJsonArray[i].value;
+        labelData[i] = chartJsonArray[i].label;
+    }
+
     const ctx = document.getElementById('myChart').getContext('2d');
     new Chart(ctx, {
         type: 'pie',
         data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            labels: labelData,
             datasets: [{
                 label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
+                data: numericData,
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -104,6 +126,10 @@
             }]
         },
         options: {
+            title: {
+                display: true,
+                text: 'Project Statuses'
+            },
             scales: {
                 y: {
                     beginAtZero: true
@@ -111,6 +137,14 @@
             }
         }
     });
+
+    function decodeHtml(html) {
+        var txt = document.createElement("textarea");
+        txt.innerHTML = html;
+
+        return txt.value;
+    }
+
 </script>
 
 </body>
